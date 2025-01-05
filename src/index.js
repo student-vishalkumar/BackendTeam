@@ -3,8 +3,12 @@ import { StatusCodes } from 'http-status-codes';
 
 import connectDB from './config/dbConfig.js';
 import { PORT } from './config/serverConfig.js';
+import apiRouter from './routes/apiRouter.js';
 
 const app = express();
+
+app.use('/api', apiRouter);
+
 
 app.get('/ping', (req, res) => {
     return res.status(StatusCodes.OK).json({
@@ -14,8 +18,10 @@ app.get('/ping', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT}`);
-    connectDB()
+    connectDB();
 })
+
+
 
 // kumar878vishal
 // oE2mCd5P34Nv1fEO
