@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -7,7 +8,8 @@ const userSchema = new mongoose.Schema(
             required: [true, 'Email is required'],
             unique: [true, 'Email already exists'],
             // eslint-disable-next-line no-useless-escape
-            match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+            match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+                 'Please fill a valid email address']
         }, 
 
         password: {
@@ -17,11 +19,12 @@ const userSchema = new mongoose.Schema(
          
         username: {
             type: String,
-            required: [true, 'username is required'],
-            unique: [true, 'username already exist'],
+            required: [true, 'Username is required'],
+            unique: [true, 'Username already exist'],
+            minLength: [3, 'Username must be at least 3 characters'],
             match: [
                 /^[a-zA-Z0-9]+$/,
-                'username must contain only letter and numbers'
+                'Username must contain only letter and numbers'
             ]
         },
 
@@ -34,10 +37,15 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre('save', function saveUser(next) {
     const user = this;
+
+    console.log('User before saving:', user);
+    const SALT = bcrypt.genSaltSync(9);
+    const hashedPassword = bcrypt.hashSync(user.password, SALT);
+    user.password = hashedPassword;
     user.avatar = `https://robohash.org/${user.username}`;
     next();
 });
 
-const user = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
 
-export default user;
+export default User;
