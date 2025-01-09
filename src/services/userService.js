@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
 
-import ClientError from '../utils/error/ClientError.js';
 import userRepository from '../repositories/userRepository.js';
 import { createJWT } from '../utils/common/authUtils.js';
+import ClientError from '../utils/error/ClientError.js';
 import ValidationError from '../utils/error/validationError.js';
 
 export const signupUserService = async (data) => {
