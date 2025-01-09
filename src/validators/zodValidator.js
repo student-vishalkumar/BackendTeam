@@ -3,13 +3,13 @@ import { StatusCodes } from 'http-status-codes';
 import { customErrorResponse } from '../utils/common/responseObject.js';
 
 export const validate = (schema) => {
-  console.log('schema', schema)
+  
   return async (req, res, next) => {
     try {
-      console.log('log befor parseAsync at validate', req.body);
-      // console.log('object', z.object);
+      // console.log('log befor parseAsync at validate', req.body);
+      
       await schema.parseAsync(req.body);
-      console.log('log befor parseAsync at validate', req.body);
+      // console.log('log after parseAsync at validate', req.body);
       next();
     } catch (error) {
       console.log('error at validate', error)

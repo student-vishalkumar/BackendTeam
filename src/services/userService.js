@@ -1,4 +1,9 @@
+import bcrypt from 'bcrypt';
+import { StatusCodes } from 'http-status-codes';
+
+import ClientError from '../utils/error/ClientError.js';
 import userRepository from '../repositories/userRepository.js';
+import { createJWT } from '../utils/common/authUtils.js';
 import ValidationError from '../utils/error/validationError.js';
 
 export const signupUserService = async (data) => {
@@ -24,5 +29,42 @@ export const signupUserService = async (data) => {
                 'A user with same email or same username already exists'
             )
         }
+    }
+}
+
+
+export const signinUserService = async (data) => {
+
+    try {
+    const user = await userRepository.getByEmail(data.email);
+
+    if(!user) {
+        throw new ClientError({
+            explanation: 'Invalid data sent from user',
+            message: 'User with this email is not exist',
+            statusCode: StatusCodes.BAD_REQUEST
+        });
+    }
+
+    const isPassword = bcrypt.compareSync(data.password, user.password);
+
+    if(!isPassword) {
+        throw new ClientError({
+            explanation: 'Invalid data sent from user',
+            message: 'Invalid password, please try again',
+            statusCode: StatusCodes.BAD_REQUEST
+        });
+    }
+
+    return {
+        username: user.username,
+        avatar: user.avatar,
+        email: user.email,
+        token: createJWT({ id: user._id, email: user.email})
+    }
+
+    } catch(error) {
+        console.log('signin service error', error);
+        throw error;
     }
 }
