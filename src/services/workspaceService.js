@@ -6,6 +6,18 @@ import workspaceRepository from '../repositories/workspaceRepository.js';
 import ClientError from '../utils/error/ClientError.js';
 import ValidationError from '../utils/error/validationError.js';
 
+const isUserAdminOfWorkspace = (workspace, userId) => {
+  return workspace.members.find(
+    (member) => member.memberId.toString() === userId && member.role === 'admin'
+  );
+};
+
+const isUserMemberOfWorkspace = (workspace, userId) => {
+  return workspace.members.find(
+    (member) => member.memberId.toString() === userId
+  );
+};
+
 export const createWorkspaceService = async (workspaceData) => {
   try {
     const joinCode = uuidv4().substring(0, 6).toUpperCase();
@@ -17,7 +29,7 @@ export const createWorkspaceService = async (workspaceData) => {
     });
 
     console.log('created workspace', response);
-    console.log('workspace id' , response._id);
+    console.log('workspace id', response._id);
 
     console.log('worlspaceData.owner', workspaceData.owner);
     await workspaceRepository.addMemberToWorkspace(
@@ -56,31 +68,31 @@ export const createWorkspaceService = async (workspaceData) => {
 
 export const getWorkspacesUserIsMemberOfService = async (userId) => {
   try {
-    const response = await workspaceRepository.fetchAllWorkspaceByMemberId(userId);
+    const response =
+      await workspaceRepository.fetchAllWorkspaceByMemberId(userId);
 
     return response;
   } catch (error) {
     console.log('get workspaces error', error);
     throw error;
   }
-}
+};
 
-export const deleteWorkspaceService = async(workspaceId, userId) =>{
+export const deleteWorkspaceService = async (workspaceId, userId) => {
   try {
     const workspace = await workspaceRepository.getById(workspaceId);
 
-    if(!workspace) {
+    if (!workspace) {
       throw new ClientError({
         explanation: 'Invalid data sent from the client',
         message: 'workspace not found',
         statusCode: StatusCodes.NOT_FOUND
-      })
+      });
     }
 
-    const isAllowed = workspace.members.find(
-      (member) => member.memberId.toString() === userId && member.role === 'admin');
+    const isAllowed = isUserAdminOfWorkspace(workspace, userId);
 
-    if(isAllowed) {
+    if (isAllowed) {
       await channelRepository.deleteMany(workspace.channles);
 
       const response = await workspaceRepository.delete(workspaceId);
@@ -94,7 +106,58 @@ export const deleteWorkspaceService = async(workspaceId, userId) =>{
       statusCode: StatusCodes.UNAUTHORIZED
     });
   } catch (error) {
-    console.log('deleteWSservice error',error);
+    console.log('deleteWSservice error', error);
     throw error;
   }
-}
+};
+
+export const getWorkspaceService = async (workspaceId, userId) => {
+  try {
+    const workspace = await workspaceRepository.getById(workspaceId);
+
+    if (!workspace) {
+      throw new ClientError({
+        explanation: 'Invalid data sent from the client',
+        message: 'workspace not found',
+        statusCode: StatusCodes.NOT_FOUND
+      });
+    }
+
+    const isMember = isUserMemberOfWorkspace(workspace, userId);
+
+    if (!isMember) {
+      throw new ClientError({
+        explanation: 'Invalid data sent from the Client',
+        message: 'user is not member of workspace',
+        statusCode: StatusCodes.UNAUTHORIZED
+      });
+    }
+
+    return workspace;
+  } catch (error) {
+    console.log('get workspace error', error);
+    throw error;
+  }
+};
+
+export const getWorkspaceByJoinCodeService = async (joinCode) => {
+  try {
+    const workspace = workspaceRepository.getWorkspaceByJoinCode(joinCode);
+
+    if (!workspace) {
+      throw new ClientError({
+        explanation: 'Invalid data sent from the client',
+        message: 'workspace not found',
+        statusCode: StatusCodes.NOT_FOUND
+      });
+    }
+
+    return workspace;
+
+  } catch (error) {
+    console.log('getWorkspaceByJoinCodeService error', error);
+
+    throw error;
+  }
+
+};
