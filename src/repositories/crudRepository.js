@@ -20,6 +20,11 @@ export default function crudRepository(model) {
                 new: true,
             });
             return updatedDoc;
+        },
+
+        deleteById: async function (id) {
+            const deletedWs = await model.findByIdAndDelete(id);
+            return deletedWs;
         }
     }
 }
