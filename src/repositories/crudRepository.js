@@ -22,9 +22,18 @@ export default function crudRepository(model) {
             return updatedDoc;
         },
 
-        deleteById: async function (id) {
-            const deletedWs = await model.findByIdAndDelete(id);
-            return deletedWs;
+        delete: async function (id) {
+            const response = await model.findByIdAndDelete(id);
+            return response;
+          },
+
+        deleteMany: async function(modelId) {
+            const response = await model.deleteMany({
+                _id: {
+                    $in: modelId
+                }
+            });
+            return response;
         }
     }
 }

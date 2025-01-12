@@ -13,4 +13,6 @@ router.post('/', isAuthenticated, validate(createWorkspaceSchema), createWorkspa
 
 router.get('/', isAuthenticated, getWorkspacesUserIsMemberOfController);
 
+router.delete('/:workspaceId', isAuthenticated, deleteWorkspaceController);
+
 export default router;
