@@ -2,6 +2,7 @@ import express from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import connectDB from './config/dbConfig.js';
+import mailer from './config/mailConfig.js'
 import { PORT } from './config/serverConfig.js';
 import apiRouter from './routes/apiRouter.js';
 
@@ -19,9 +20,17 @@ app.get('/ping', (req, res) => {
     })
 })
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`server is running on ${PORT}`);
     connectDB();
+    const mailRes = await mailer.sendMail({
+        from: 'vishalbjrkumar@gmail.com',
+        to: 'kumar878vishal@gmail.com',
+        subject: 'sample mail',
+        text: 'welcom in message slack'
+    })
+
+    console.log(mailRes)
 })
 
 

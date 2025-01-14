@@ -4,7 +4,12 @@ import Channel from "../Schema/channel.js";
 import crudRepository from "./crudRepository.js";
 
 const channelRepository = {
-    ...crudRepository(Channel)
+    ...crudRepository(Channel), 
+
+    getChannelWithWorkspaceDetails: async function (channelId) {
+        const channel = await Channel.findById(channelId).populate('workspaceId');
+        return channel;
+    }
 }
 
 export default channelRepository;

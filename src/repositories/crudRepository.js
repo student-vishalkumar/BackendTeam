@@ -16,7 +16,7 @@ export default function crudRepository(model) {
         },
 
         update: async function (id, data) {
-            const updatedDoc = await model.findByIdAndupadte(id, data, {
+            const updatedDoc = await model.findByIdAndUpdate(id, data, {
                 new: true,
             });
             return updatedDoc;

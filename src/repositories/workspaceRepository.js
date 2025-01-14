@@ -1,13 +1,21 @@
 import { StatusCodes } from "http-status-codes";
 
-import Channel from "../Schema/channel.js";
 import User from "../Schema/user.js";
 import Workspace from "../Schema/workspace.js";
 import ClientError from "../utils/error/ClientError.js";
+import channelRepository from "./channelRepository.js";
 import crudRepository from "./crudRepository.js";
 
 const workspaceRepository = {
     ...crudRepository(Workspace),
+
+    getWorkspaceDetailsById: async function(workspaceId) {
+        const workspace = await Workspace.findById(workspaceId)
+        .populate('members.memberId', 'username email avatar'
+        ).populate('channels');
+
+        return workspace;
+    },
 
     getWorkspaceByName: async function(workspaceName) {
         const workspace = await Workspace.findOne(
@@ -117,7 +125,10 @@ const workspaceRepository = {
             });
         };
 
-        const channel = await Channel.create({ name: channelName });
+        const channel = await channelRepository.create({
+            name: channelName,
+            workspaceId: workspaceId
+          });
 
         workspace.channels.push(channel);
 

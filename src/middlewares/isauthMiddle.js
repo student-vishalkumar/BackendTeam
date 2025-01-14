@@ -30,10 +30,9 @@ export const isAuthenticated = async (req, res, next) => {
                 )
             )
         }
-        console.log('response.id',response.id);
 
         const user = await userRepository.getById(response.id);
-        console.log('user.id',user.id)
+    
         req.user = user.id;
         next();
     } catch (error) {

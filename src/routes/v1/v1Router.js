@@ -1,5 +1,6 @@
 import express from 'express';
 
+import channelRouter from './channels.js'
 import userRouter from './users.js';
 import workspaceRouter from './workspace.js'
 
@@ -9,4 +10,6 @@ router.use('/users', userRouter);
 
 router.use('/workspaces', workspaceRouter);
 
-export default router;
+router.use('/channels', channelRouter);
+
+export default router
