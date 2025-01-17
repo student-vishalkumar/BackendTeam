@@ -9,7 +9,7 @@ import { workspaceJoinMail } from '../utils/common/mailObject.js';
 import ClientError from '../utils/error/ClientError.js';
 import ValidationError from '../utils/error/validationError.js';
 
-const isUserAdminOfWorkspace = (workspace, userId) => {
+export const isUserAdminOfWorkspace = (workspace, userId) => {
   return workspace.members.find(
     (member) => (member.memberId.toString() === userId || member.memberId._id.toString() === userId) && member.role === 'admin'
   );
