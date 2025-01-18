@@ -3,12 +3,12 @@ import crudRepository from './crudRepository.js';
 const messageRepository = {
   ...crudRepository(Message),
 
-  getPaginatedMessaged: async (messageParama, page, limit) => {
-    const messages = await Message.find(messageParama)
+  getPaginatedMessaged: async (messageParams, page, limit) => {
+    const messages = await Message.find(messageParams)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .populate('senderId', 'username email .avatar');
+      .populate('senderId', 'username email avatar');
 
       return messages;
   }
