@@ -34,3 +34,10 @@ export const getMessagePaginatedService = async (
 
   return messages;
 };
+
+
+export const createMessageService = async (message) => {
+  const createdMessage = await messageRepository.create(message);
+
+  return createdMessage;
+}
