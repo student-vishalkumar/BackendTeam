@@ -1,14 +1,29 @@
 import bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
 
+import { ENABLE_EMAIL_VERIFICATION } from '../config/serverConfig.js';
+import { addEmailtoMailQueue } from '../producers/mailQueueProducer.js';
 import userRepository from '../repositories/userRepository.js';
 import { createJWT } from '../utils/common/authUtils.js';
+import { verifyEmailMail } from '../utils/common/mailObject.js';
 import ClientError from '../utils/error/ClientError.js';
 import ValidationError from '../utils/error/validationError.js';
 
 export const signupUserService = async (data) => {
     try {
-        const newUser = await userRepository.create(data);
+        const newUser = await userRepository.signupUser(data);
+        console.log('trigred1')
+        
+        console.log("env",ENABLE_EMAIL_VERIFICATION)
+        
+        if (ENABLE_EMAIL_VERIFICATION) {
+            // send verification email
+            console.log('triggerd');
+            addEmailtoMailQueue({
+                ...verifyEmailMail(newUser.verificationToken),
+                to: newUser.email
+            })
+        }
         return newUser;
     } catch(error) {
         console.log('user service error', error);
@@ -66,6 +81,44 @@ export const signinUserService = async (data) => {
 
     } catch(error) {
         console.log('signin service error', error);
+        throw error;
+    }
+}
+
+
+export const verifyTokenService = async (token) => {
+    try {
+        console.log('tokens', token)
+        const user = await userRepository.getByToken(token);
+
+        console.log('user', user)
+        if(!user) {
+            throw new ClientError({
+                explanation: 'Invalid data sent from the user',
+                message: 'Invalid Token',
+                statusCode: StatusCodes.BAD_REQUEST
+            })
+        }
+
+        if(user.verificationTokenExpiry < Date.now()) {
+            throw new ClientError({
+                explanation: 'Invalid data sent for the client',
+                message: 'emial verification token is expired',
+                statusCode: StatusCodes.UNAUTHORIZED
+            })
+        }
+
+        user.isVerified = true;
+
+        user.verificationToken = null;
+
+        user.verificationTokenExpiry = null;
+
+        await user.save();
+
+        return user;
+    } catch (error) {
+        console.log('verifyTokenService error', error);
         throw error;
     }
 }

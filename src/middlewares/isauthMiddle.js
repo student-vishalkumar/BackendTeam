@@ -7,8 +7,10 @@ import { customErrorResponse, internalErrorResponse } from "../utils/common/resp
 
 export const isAuthenticated = async (req, res, next) => {
     try {
-        const token = req.headers['x-access-token'];
 
+        console.log('req', req.headers['x-access-token']);
+        const token = req.headers['x-access-token'];
+        console.log('token in md', token);
         if(!token) {
             return res.status(StatusCodes.FORBIDDEN).json(customErrorResponse(
                 {
@@ -38,7 +40,7 @@ export const isAuthenticated = async (req, res, next) => {
     } catch (error) {
         console.log('isAuth error', error);
 
-        if(error === 'jsonWebTokenError') {
+        if(error.name === 'jsonWebTokenError'|| error.name === 'TokenExpiredError') {
             return res.status(StatusCodes.FORBIDDEN).json(
                 customErrorResponse(
                     {
