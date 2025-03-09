@@ -30,7 +30,7 @@ export const updateChannelByIdController = async (req, res) => {
 
     return res.status(StatusCodes.OK).json(successResponse(response, 'channel name updated success fully'));
   } catch (error) {
-    console.log('channel by Id error', error)
+    console.log('channel by Id error', error);
 
     if(error.statusCode) {
       return res.status(error.statusCode).json(customErrorResponse(error));

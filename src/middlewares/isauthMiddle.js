@@ -8,9 +8,9 @@ import { customErrorResponse, internalErrorResponse } from "../utils/common/resp
 export const isAuthenticated = async (req, res, next) => {
     try {
 
-        console.log('req', req.headers['x-access-token']);
+        
         const token = req.headers['x-access-token'];
-        console.log('token in md', token);
+        
         if(!token) {
             return res.status(StatusCodes.FORBIDDEN).json(customErrorResponse(
                 {

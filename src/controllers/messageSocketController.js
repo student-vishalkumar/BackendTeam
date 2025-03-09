@@ -7,6 +7,7 @@ import {
 export default function messageHandlers(io, socket) {
   socket.on(NEW_MESSAGE_EVENT, async function createMessageHandler(data, cb) {
     const { channelId } = data;
+    console.log('data', data)
     const messageResponse = await createMessageService(data);
     // socket.broadcast.emit(NEW_MESSAGE_RECIVED_EVENT, messageResponse);
     io.to(channelId).emit(NEW_MESSAGE_RECIVED_EVENT, messageResponse)
