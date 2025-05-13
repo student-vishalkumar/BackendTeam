@@ -5,7 +5,7 @@ import { customErrorResponse, internalErrorResponse, successResponse } from '../
 
 export const getMessageController = async (req, res) => {
   try {
-    const response = getMessagePaginatedService(
+    const response = await getMessagePaginatedService(
         {
           channelId: req.params.channelId
         },
@@ -14,6 +14,7 @@ export const getMessageController = async (req, res) => {
         req.user
       );
     
+      console.log('response', response);
       return res
         .status(StatusCodes.OK)
         .json(successResponse(response, 'message fetched successfully'));

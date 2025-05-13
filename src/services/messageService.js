@@ -37,7 +37,8 @@ export const getMessagePaginatedService = async (
 
 
 export const createMessageService = async (message) => {
-  const createdMessage = await messageRepository.create(message);
+  const newMessage = await messageRepository.create(message);
 
-  return createdMessage;
+  const messageDeatails = await messageRepository.getMessageDetails(newMessage._id);
+  return messageDeatails;
 }

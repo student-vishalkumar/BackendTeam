@@ -1,10 +1,10 @@
 import express from 'express';
 
 import { getMessageController } from '../../controllers/getMessageController.js';
-import isAuthenticated from '../../middlewares/isauthMiddle.js'
+import {isAuthenticated} from '../../middlewares/isauthMiddle.js'
 
 const router = express.Router();
 
-router.get('messages/:channelId', isAuthenticated, getMessageController);
+router.get('/:channelId', isAuthenticated, getMessageController);
 
-export default router;
+export default router;;
