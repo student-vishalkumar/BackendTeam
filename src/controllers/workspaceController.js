@@ -10,6 +10,7 @@ import {
   getWorkspaceService,
   getWorkspacesUserIsMemberOfService,
   joinWorkspaceService,
+  removeMemberFromWorkspaceService,
   resetJoinCodeService,
   updateWorkspaceService
 } from '../services/workspaceService.js';
@@ -234,6 +235,25 @@ export const joinWorkspaceController = async(req, res) => {
 
     if(error.statusCode) {
       return res.status(error.statusCode).json(customErrorResponse(error))
+    }
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(internalErrorResponse(error));
+  }
+}
+
+
+export const removeMemberFromWorkspaceController = async(req, res) => {
+  try {
+    const userId = req.user;
+
+    const {workspaceId, memberId} = req.body;
+
+    const reponse = await removeMemberFromWorkspaceService(userId, workspaceId, memberId);
+
+    return res.status(StatusCodes.OK).json(successResponse(reponse, "Member Removed Successfully"));
+  } catch (error) {
+    if(error.statusCode) {
+      return res.status(error.statusCode).json(customErrorResponse(error));
     }
 
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(internalErrorResponse(error));

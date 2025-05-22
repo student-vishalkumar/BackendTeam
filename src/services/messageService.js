@@ -42,3 +42,7 @@ export const createMessageService = async (message) => {
   const messageDeatails = await messageRepository.getMessageDetails(newMessage._id);
   return messageDeatails;
 }
+
+// export const deleteMessageService = async(id) => {
+
+// }

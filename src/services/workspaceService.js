@@ -13,7 +13,7 @@ export const isUserAdminOfWorkspace = (workspace, userId) => {
   return workspace.members.find(
     (member) => (member.memberId.toString() === userId || member.memberId._id.toString() === userId) && member.role === 'admin'
   );
-};
+}
 
 export const isUserMemberOfWorkspace = (workspace, userId) => {
 
@@ -370,4 +370,56 @@ export const joinWorkspaceService = async(workspaceId, joinCode, userId) => {
 
     throw error;
   }
+}
+
+export const removeMemberFromWorkspaceService = async(userId, workspaceId, memberId)=> {
+
+  if(userId.toString() === memberId.toString()) {
+    throw {
+      message: "Admin can not remove yourself from Workspace",
+      explanation: "User is Admin of the Workspace",
+      statusCode: StatusCodes.BAD_REQUEST
+    }
+  }
+
+  const workspace = await workspaceRepository.getById(workspaceId);
+
+  console.log('ws', workspace);
+
+  if(!workspace) {
+    throw {
+      message: "Workspace not found",
+      explanation: "Invalid data sent",
+      statusCode: StatusCodes.NOT_FOUND
+    }
+  }
+
+  const isAdmin = isUserAdminOfWorkspace(workspace,userId);
+
+  console.log('isAdmin', isAdmin);
+  if(!isAdmin) {
+    throw {
+      message: "Member is not authorized to remove members from the worspace",
+      explanation: "Unauthorized person",
+      statusCode: StatusCodes.UNAUTHORIZED
+    }
+  }
+
+  const isMember = isUserMemberOfWorkspace(workspace,memberId);
+
+  console.log('isMember', isMember);
+  if(!isMember) {
+    throw {
+      message: "Member is not part of the workspace",
+      explanation: "Invalid data sent from the user",
+      statusCode: StatusCodes.BAD_REQUEST
+    }
+  }
+
+  const response = await workspaceRepository.removeMemberFromWorkspace(workspaceId, memberId)
+
+  console.log('response', response);
+
+  return response;
+  
 }

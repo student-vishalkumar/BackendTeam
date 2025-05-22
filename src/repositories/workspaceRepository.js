@@ -142,6 +142,39 @@ const workspaceRepository = {
           'members.memberId': memberId
         }).populate('members.memberId', 'username email avatar');
         return workspaces;
+    },
+
+    removeMemberFromWorkspace: async function(workspaceId, memberId) {
+        const workspace = await Workspace.findById(workspaceId);
+
+        console.log('wsAtRepo', workspace)
+        if(!workspace) {
+            throw new ClientError({
+                message: "Workspace not found",
+                explanation: "Invalid data sent from the User",
+                statsCode: StatusCodes.NOT_FOUND
+            })
+        }
+
+        const exitMember = workspace.members.find((member) => member.memberId.toString() === memberId.toString());
+
+        console.log('exitMember', exitMember);
+
+        if(!exitMember) {
+            throw new ClientError({
+                message: "User is not is part the workspace",
+                explanation: "Invalid data sent from the User",
+                statsCode: StatusCodes.NOT_FOUND
+            })
+        }
+
+        workspace.members = workspace.members.filter((member) => member.memberId.toString() !== memberId.toString());
+
+        console.log('ws member', workspace.members)
+
+        await workspace.save();
+
+        return workspace;
     }
 }
 
